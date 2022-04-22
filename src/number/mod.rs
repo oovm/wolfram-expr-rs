@@ -57,7 +57,7 @@ impl From<u32> for Number {
 // }
 
 impl From<i8> for Number {
-    fn from(n: u32) -> Self {
+    fn from(n: i8) -> Self {
         Number::Integer(n as i64)
     }
 }
@@ -69,13 +69,13 @@ impl From<i16> for Number {
 }
 
 impl From<i32> for Number {
-    fn from(n: u32) -> Self {
+    fn from(n: i32) -> Self {
         Number::Integer(n as i64)
     }
 }
 
 impl From<i64> for Number {
-    fn from(n: u32) -> Self {
+    fn from(n: i64) -> Self {
         Number::Integer(n as i64)
     }
 }

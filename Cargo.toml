@@ -11,7 +11,7 @@ keywords = ["wolfram", "wolfram-language", "mathematica", "wolfram-engine", "exp
 categories = ["encoding"]
 
 [features]
-default = []
+default = ["wxf"]
 wxf = ["integer-encoding", "flate2"]
 
 # Whether to publically export nom functions for parsing symbols. This feature should not
