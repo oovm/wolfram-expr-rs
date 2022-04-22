@@ -4,20 +4,21 @@ use integer_encoding::VarInt;
 use std::io::Write;
 
 impl Expr {
+    /// Export as wxf format.
     pub fn as_wxf(&self) -> Vec<u8> {
         let mut out = Vec::new();
         out.extend_from_slice(b"8:");
         self.write_internal(&mut out);
-        return out;
+        out
     }
+    /// Export as compressed wxf format.
     pub fn as_wxf_compressed(&self) -> Vec<u8> {
         let mut input = Vec::new();
         let mut e = ZlibEncoder::new(vec![], Compression::new(9));
         self.write_internal(&mut input);
         let mut out = Vec::with_capacity(input.len());
-        match e.write_all(&input) {
-            Ok(_) => out.extend_from_slice(b"8C:"),
-            Err(..) => {},
+        if e.write_all(&input).is_ok() {
+            out.extend_from_slice(b"8C:")
         };
         match e.finish() {
             Ok(o) => out.extend_from_slice(&o),
@@ -25,7 +26,7 @@ impl Expr {
                 panic!("unknown error when compress");
             },
         };
-        return out;
+        out
     }
 
     fn write_internal(&self, out: &mut Vec<u8>) {
