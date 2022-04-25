@@ -3,6 +3,7 @@
 #![allow(clippy::let_and_return)]
 #![warn(missing_docs)]
 
+mod association;
 mod conversion;
 mod number;
 pub mod symbol;
@@ -16,6 +17,7 @@ mod test_readme {
 }
 
 
+pub use self::association::Association;
 pub use self::number::{Number, F32, F64};
 use std::fmt;
 use std::mem;
@@ -296,16 +298,16 @@ impl Expr {
     /// Construct the expression `<|"a"->1, "b":>2|>`:
     ///
     /// ```
-    /// use wolfram_expr::Expr;
+    /// use wolfram_expr::{Association, Expr};
     ///
-    /// let assoc = Expr::association(vec![
-    ///     Expr::rule(Expr::from("a"), Expr::from(1)),
-    ///     Expr::rule_delayed(Expr::from("b"), Expr::from(2)),
-    /// ]);
+    /// let mut assoc = Association::new();
+    /// assoc.insert("a", Expr::from(1));
+    /// assoc.insert_delayed("b", Expr::from(2));
+    /// let expr = Expr::association(assoc);
     /// ```
     #[inline]
-    pub fn association(elements: Vec<Expr>) -> Expr {
-        Expr::function("System`Association", elements)
+    pub fn association(map: impl Into<Association>) -> Expr {
+        Expr::from(map.into())
     }
 }
 
