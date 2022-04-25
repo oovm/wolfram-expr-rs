@@ -1,9 +1,11 @@
 use crate::Expr;
 use indexmap::map::IndexMap;
 use std::collections::{BTreeMap, HashMap};
+use std::fmt::{Debug, Display, Formatter};
 use std::iter::FromIterator;
 use std::ops::{Deref, DerefMut};
 
+#[derive(Debug, Clone)]
 pub struct Association {
     /// key -> (is_delayed, value)
     records: IndexMap<Expr, (bool, Expr)>,
@@ -44,6 +46,9 @@ impl Association {
         let value = value.into();
         self.records.insert(key, (true, value));
     }
+    pub fn as_expr(&self) -> Expr {
+        Expr::from(self.clone())
+    }
 }
 
 macro_rules! map_like {
@@ -80,5 +85,42 @@ impl From<Association> for Expr {
             elements.push(item)
         }
         Expr::function("System`Association", elements)
+    }
+}
+
+impl Display for Association {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        let mut indent = 0;
+        self.fmt_indent(f, f.alternate(), &mut indent)
+    }
+}
+
+impl Association {
+    pub(crate) fn fmt_indent(
+        &self,
+        f: &mut Formatter<'_>,
+        alternate: bool,
+        indent: &mut usize,
+    ) -> std::fmt::Result {
+        write!(f, "<|")?;
+        if alternate {
+            *indent += 4;
+            writeln!(f)?
+        }
+        for (key, (rule, value)) in &self.records {
+            match rule {
+                true => write!(f, "{:indent$}{} :> {}", "", key, value, indent = indent)?,
+                false => {
+                    write!(f, "{:indent$}{} -> {}", "", key, value, indent = indent)?
+                },
+            }
+            if alternate {
+                writeln!(f)?
+            }
+        }
+        if alternate {
+            *indent -= 4;
+        }
+        write!(f, "|>")
     }
 }
