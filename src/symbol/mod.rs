@@ -346,6 +346,12 @@ impl Display for SymbolNameRef<'_> {
     }
 }
 
+impl From<&str> for Symbol {
+    fn from(s: &str) -> Self {
+        Symbol::new(s)
+    }
+}
+
 /*
 impl Symbol {
     // /// Create a symbol in the System` context.

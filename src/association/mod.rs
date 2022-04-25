@@ -5,6 +5,7 @@ use std::fmt::{Debug, Display, Formatter};
 use std::iter::FromIterator;
 use std::ops::{Deref, DerefMut};
 
+/// A map from variable names to expressions.
 #[derive(Debug, Clone)]
 pub struct Association {
     /// key -> (is_delayed, value)
@@ -26,6 +27,12 @@ impl DerefMut for Association {
 }
 
 impl Association {
+    /// Build a new Association
+    pub fn new() -> Self {
+        Self {
+            records: IndexMap::new(),
+        }
+    }
     /// Inserts a key-value pair into the association.
     pub fn insert<K, V>(&mut self, key: K, value: V)
     where
@@ -46,6 +53,7 @@ impl Association {
         let value = value.into();
         self.records.insert(key, (true, value));
     }
+    /// Convert to [`Expr`]
     pub fn as_expr(&self) -> Expr {
         Expr::from(self.clone())
     }
@@ -107,19 +115,25 @@ impl Association {
             *indent += 4;
             writeln!(f)?
         }
-        for (key, (rule, value)) in &self.records {
-            match rule {
-                true => write!(f, "{:indent$}{} :> {}", "", key, value, indent = indent)?,
-                false => {
-                    write!(f, "{:indent$}{} -> {}", "", key, value, indent = indent)?
-                },
-            }
+        for (i, (key, (rule, value))) in self.records.iter().enumerate() {
+            let is_last = i == self.records.len() - 1;
             if alternate {
-                writeln!(f)?
+                write!(f, "{}", " ".repeat(*indent))?
+            }
+            match rule {
+                true => write!(f, "{} :> {}", key, value)?,
+                false => write!(f, "{} -> {}", key, value)?,
+            }
+            if !is_last {
+                match alternate {
+                    true => writeln!(f, ",")?,
+                    false => write!(f, ", ")?,
+                }
             }
         }
         if alternate {
             *indent -= 4;
+            writeln!(f)?
         }
         write!(f, "|>")
     }

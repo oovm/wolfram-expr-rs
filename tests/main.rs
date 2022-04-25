@@ -1,4 +1,19 @@
-use wolfram_expr::Expr;
+use wolfram_expr::{Association, Expr};
+
+#[test]
+fn association_display() {
+    let mut assoc = Association::new();
+    assoc.insert("a", Expr::from(1));
+    assoc.insert_delayed("b", Expr::from(2));
+    assert_eq!(format!("{}", assoc), r#"<|"a" -> 1, "b" :> 2|>"#);
+    assert_eq!(
+        format!("{:#}", assoc),
+        r#"<|
+    "a" -> 1,
+    "b" :> 2
+|>"#
+    );
+}
 
 #[test]
 fn test_curry() {
