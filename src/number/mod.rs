@@ -31,6 +31,20 @@ impl Number {
     }
 }
 
+impl std::fmt::Display for Number {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        match *self {
+            Number::Integer(ref int) => write!(f, "{}", int),
+            Number::Real(ref real) => {
+                // Make sure we're not printing NotNan (which surprisingly implements
+                // Display)
+                let real: f64 = **real;
+                write!(f, "{:?}", real)
+            },
+        }
+    }
+}
+
 
 macro_rules! integer_like {
     ($($t:ty),*) => {

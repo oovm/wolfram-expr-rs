@@ -1,10 +1,12 @@
-use crate::{Expr, ExprKind, Normal, Symbol};
+use crate::{Association, Expr, ExprKind, Normal, Symbol};
 use flate2::{write::ZlibEncoder, Compression};
 use integer_encoding::VarInt;
 use std::io::Write;
 
 impl Expr {
     /// Export as wxf format.
+    ///
+    /// https://reference.wolfram.com/language/tutorial/WXFFormatDescription.html
     pub fn as_wxf(&self) -> Vec<u8> {
         let mut out = Vec::new();
         out.extend_from_slice(b"8:");
@@ -73,6 +75,22 @@ impl Normal {
         self.head.write_internal(out);
         for v in self.contents.iter() {
             v.write_internal(out)
+        }
+    }
+}
+
+#[allow(dead_code)]
+impl Association {
+    fn write_internal(&self, out: &mut Vec<u8>) {
+        out.push(b'A');
+        out.extend_from_slice(&self.records.len().encode_var_vec());
+        for (key, (rule, value)) in self.records.iter() {
+            match rule {
+                true => out.push(b':'),
+                false => out.push(b'-'),
+            }
+            key.write_internal(out);
+            value.write_internal(out);
         }
     }
 }

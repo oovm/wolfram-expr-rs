@@ -9,7 +9,15 @@ use std::ops::{Deref, DerefMut};
 #[derive(Debug, Clone)]
 pub struct Association {
     /// key -> (is_delayed, value)
-    records: IndexMap<Expr, (bool, Expr)>,
+    pub(crate) records: IndexMap<Expr, (bool, Expr)>,
+}
+
+impl Default for Association {
+    fn default() -> Self {
+        Self {
+            records: IndexMap::new(),
+        }
+    }
 }
 
 impl Deref for Association {
@@ -29,9 +37,7 @@ impl DerefMut for Association {
 impl Association {
     /// Build a new Association
     pub fn new() -> Self {
-        Self {
-            records: IndexMap::new(),
-        }
+        Self::default()
     }
     /// Inserts a key-value pair into the association.
     pub fn insert<K, V>(&mut self, key: K, value: V)

@@ -436,19 +436,6 @@ impl fmt::Display for Normal {
     }
 }
 
-impl fmt::Display for Number {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match *self {
-            Number::Integer(ref int) => write!(f, "{}", int),
-            Number::Real(ref real) => {
-                // Make sure we're not printing NotNan (which surprisingly implements
-                // Display)
-                let real: f64 = **real;
-                write!(f, "{:?}", real)
-            },
-        }
-    }
-}
 
 //======================================
 // Comparision trait impls
